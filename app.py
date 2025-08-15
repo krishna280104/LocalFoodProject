@@ -1,33 +1,70 @@
 import streamlit as st
-import pandas as pd
 import sqlite3
 
-# Page title
-st.title("🍽️ Local Food Wastage Management System")
-st.write("Connect surplus food providers with receivers to reduce waste.")
-
 # Connect to database
-conn = sqlite3.connect("food_wastage.db")
+conn = sqlite3.connect("food_waste.db")
+c = conn.cursor()
 
-# --- Load providers data ---
-providers_df = pd.read_sql("SELECT * FROM providers", conn)
+# Create Receivers table (if not exists)
+c.execute('''
+CREATE TABLE IF NOT EXISTS Receivers (
+    receiver_id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT,
+    contact_info TEXT,
+    location TEXT
+)
+''')
+conn.commit()
 
-# --- City filter ---
-cities = providers_df['City'].dropna().unique()
-selected_city = st.selectbox("Select a city to view providers:", ["All"] + sorted(cities))
+# Streamlit page for Receivers
+st.header("Receivers Management")
 
-if selected_city != "All":
-    filtered_df = providers_df[providers_df['City'] == selected_city]
-else:
-    filtered_df = providers_df
+# --- Add Receiver ---
+with st.form("Add Receiver"):
+    name = st.text_input("Name")
+    contact = st.text_input("Contact Info (email/phone)")
+    location = st.text_input("Location")
+    submitted = st.form_submit_button("Add Receiver")
+    if submitted:
+        c.execute("INSERT INTO Receivers (name, contact_info, location) VALUES (?, ?, ?)",
+                  (name, contact, location))
+        conn.commit()
+        st.success(f"Receiver '{name}' added!")
 
-# --- Show providers table ---
-st.subheader("Food Providers")
-st.dataframe(filtered_df)
+# --- Display all Receivers ---
+st.subheader("All Receivers")
+c.execute("SELECT * FROM Receivers")
+receivers = c.fetchall()
+st.dataframe(receivers)
 
-# --- Record count ---
-st.write(f"Showing {len(filtered_df)} providers.")
+# --- Update Receiver ---
+st.subheader("Update Receiver")
+receiver_ids = [r[0] for r in receivers]
+selected_id = st.selectbox("Select Receiver ID to Update", receiver_ids)
+if selected_id:
+    new_name = st.text_input("New Name")
+    new_contact = st.text_input("New Contact Info")
+    new_location = st.text_input("New Location")
+    if st.button("Update Receiver"):
+        c.execute('''
+        UPDATE Receivers
+        SET name=?, contact_info=?, location=?
+        WHERE receiver_id=?
+        ''', (new_name, new_contact, new_location, selected_id))
+        conn.commit()
+        st.success("Receiver updated!")
 
-# Close connection
-conn.close()
+# --- Delete Receiver ---
+st.subheader("Delete Receiver")
+selected_del = st.selectbox("Select Receiver ID to Delete", receiver_ids)
+if st.button("Delete Receiver"):
+    c.execute("DELETE FROM Receivers WHERE receiver_id=?", (selected_del,))
+    conn.commit()
+    st.success("Receiver deleted!")
+
+# --- Contact Receiver ---
+st.subheader("Contact Receiver")
+for r in receivers:
+    st.markdown(f"{r[1]} — [Contact]({r[2]})")  # r[1]=name, r[2]=contact_info
+
 
