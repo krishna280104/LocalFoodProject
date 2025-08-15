@@ -5,6 +5,21 @@ page = st.sidebar.selectbox("Go to page", ["Main", "Receivers", "Food Listings"]
 if page == "Main":
     st.header("Food Providers")
     # Paste your existing Providers + filter code here
+
+
+
+    
+
+elif page == "Receivers":
+    st.header("Receivers Management")
+    # Paste your full Receivers CRUD + contact code here
+
+
+
+elif page == "Food Listings":
+    st.header("Food Listings Management")
+    # Paste your full Food Listings CRUD + contact code here
+
 import pandas as pd
 import sqlite3
 
@@ -36,19 +51,6 @@ st.write(f"Showing {len(filtered_df)} providers.")
 
 # Close connection
 conn.close()
-
-
-    
-
-elif page == "Receivers":
-    st.header("Receivers Management")
-    # Paste your full Receivers CRUD + contact code here
-
-
-
-elif page == "Food Listings":
-    st.header("Food Listings Management")
-    # Paste your full Food Listings CRUD + contact code here
 
 
 
