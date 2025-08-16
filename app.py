@@ -18,7 +18,7 @@ page = st.sidebar.radio("Go to:",
 
 # --- Home Page ---
 if page == "🏠 Home":
-    st.title("🍽️ Local Food Wastage Management System")
+    st.title("Food Wastage Management System")
     st.write("""
     This system connects **food providers** (restaurants, stores) with **receivers** (NGOs, individuals).  
     ✅ Filter food donations by location, provider, type  
