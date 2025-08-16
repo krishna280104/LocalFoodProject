@@ -185,8 +185,7 @@ elif page == "📊 Analysis (15 Queries)":
 
 
 # --- CRUD Operations ---
-
-      elif page == "✏️ CRUD Operations":
+elif page == "✏️ CRUD Operations":
     st.title("✏️ CRUD Operations")
 
     # --- Add New Food Listing ---
@@ -225,11 +224,3 @@ elif page == "📊 Analysis (15 Queries)":
         conn.commit()
         st.error(f"❌ Food ID {delete_id} has been deleted!")
 
-
-        if submitted:
-            conn.execute(
-                "INSERT INTO food_listings (Food_Name, Quantity, Expiry_Date, Provider_ID, Provider_Type, Location, Food_Type, Meal_Type) VALUES (?, ?, ?, ?, '', '', ?, ?)",
-                (food_name, quantity, str(expiry), provider_id, food_type, meal_type)
-            )
-            conn.commit()
-            st.success("✅ New food listing added!")
