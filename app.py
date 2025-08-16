@@ -185,9 +185,12 @@ elif page == "📊 Analysis (15 Queries)":
 
 
 # --- CRUD Operations ---
-elif page == "✏️ CRUD Operations":
-    st.title("✏️ CRUD Operations - Add New Food Listing")
 
+      elif page == "✏️ CRUD Operations":
+    st.title("✏️ CRUD Operations")
+
+    # --- Add New Food Listing ---
+    st.subheader("➕ Add a New Food Listing")
     with st.form("add_food"):
         food_name = st.text_input("Food Name")
         quantity = st.number_input("Quantity", min_value=1)
@@ -196,6 +199,32 @@ elif page == "✏️ CRUD Operations":
         food_type = st.selectbox("Food Type", ["Vegetarian", "Non-Vegetarian", "Vegan"])
         meal_type = st.selectbox("Meal Type", ["Breakfast", "Lunch", "Dinner", "Snacks"])
         submitted = st.form_submit_button("Add Food")
+
+        if submitted:
+            conn.execute(
+                "INSERT INTO food_listings (Food_Name, Quantity, Expiry_Date, Provider_ID, Provider_Type, Location, Food_Type, Meal_Type) VALUES (?, ?, ?, ?, '', '', ?, ?)",
+                (food_name, quantity, str(expiry), provider_id, food_type, meal_type)
+            )
+            conn.commit()
+            st.success("✅ New food listing added!")
+
+    # --- Update Food Quantity ---
+    st.subheader("✏️ Update Food Quantity")
+    food_id = st.number_input("Enter Food ID to update:", min_value=1, key="update_id")
+    new_qty = st.number_input("New Quantity:", min_value=1, key="update_qty")
+    if st.button("Update Quantity"):
+        conn.execute("UPDATE food_listings SET Quantity = ? WHERE Food_ID = ?", (new_qty, food_id))
+        conn.commit()
+        st.success(f"✅ Food ID {food_id} updated to quantity {new_qty}")
+
+    # --- Delete Food Listing ---
+    st.subheader("🗑️ Delete a Food Listing")
+    delete_id = st.number_input("Enter Food ID to delete:", min_value=1, key="delete_id")
+    if st.button("Delete Food"):
+        conn.execute("DELETE FROM food_listings WHERE Food_ID = ?", (delete_id,))
+        conn.commit()
+        st.error(f"❌ Food ID {delete_id} has been deleted!")
+
 
         if submitted:
             conn.execute(
